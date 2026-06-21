@@ -1,0 +1,389 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <span class="logo-text">v1.6</span>
+    </div>
+
+    <h1>Chatbot</h1>
+
+    <div class="header-right">
+        <div class="status-container">
+            <div class="status-dot">
+                <div class="dot-live"></div> Online
+            </div>
+            <button id="btn-analytics" title="Analytics" onclick="openAnalytics()">
+                <span class="material-symbols-outlined">bar_chart</span>
+            </button>
+            <button id="btn-engrenagem" title="Gerenciar Serviços">
+                <span class="material-symbols-outlined" id="icon-engrenagem">settings</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<div id="chat"></div>
+
+<footer>
+    <textarea id="inp" rows="1" placeholder="Descreva seu problema..."></textarea>
+    <button class="btn btn-clear" id="btn-clear">Limpar chat</button>
+    <button class="btn btn-send" id="sbtn">Enviar</button>
+</footer>
+
+<div id="modal-admin" class="modal-escondido">
+    <div class="modal-conteudo">
+        <span id="fechar-modal"><span class="material-symbols-outlined">close</span></span>
+
+        <h2 id="modal-titulo">
+            <span class="material-symbols-outlined">settings</span> Gerenciar Serviços
+        </h2>
+
+        <div id="menu-gerenciar">
+            <button id="btn-menu-add" class="modal-btn modal-btn-blue">
+                <span class="material-symbols-outlined">add_circle</span> Adicionar Novo Serviço
+            </button>
+            <button id="btn-menu-alt" class="modal-btn modal-btn-dark">
+                <span class="material-symbols-outlined">edit</span> Alterar Serviço Existente
+            </button>
+            <button id="btn-menu-rem" class="modal-btn modal-btn-red">
+                <span class="material-symbols-outlined">delete</span> Remover Serviço
+            </button>
+        </div>
+
+        <div id="tela-formulario" class="tela-escondida">
+            <button id="btn-voltar-1" class="btn-voltar">
+                <span class="material-symbols-outlined">arrow_back</span> Voltar ao Menu
+            </button>
+
+            <div id="box-busca-alterar" class="box-busca tela-escondida">
+                <div class="busca-wrapper">
+                    <span class="material-symbols-outlined busca-icon busca-icon-blue">search</span>
+                    <input type="text" id="busca-alterar" placeholder="Digite o nome do serviço para buscar..." autocomplete="off" class="busca-input busca-input-blue">
+                </div>
+                <div id="lista-busca-alterar" class="lista-busca tela-escondida"></div>
+            </div>
+
+            <div id="campos-formulario" class="campos-formulario">
+                <input type="text" id="adm-nome" placeholder="NOME DO SERVIÇO EXATO (Ex: 7-ZIP)">
+                <input type="text" id="adm-time" placeholder="Time Responsável">
+                <input type="text" id="adm-plataforma" placeholder="Plataforma (Ex: SMT, ITSM.D)">
+                <input type="text" id="adm-pode-fechar" placeholder="Pode Fechar? (SIM / NÃO)">
+                <input type="text" id="adm-obs" placeholder="Observação">
+                <input type="text" id="adm-desc" placeholder="Descrição">
+                <input type="text" id="adm-exemplos" placeholder="Exemplos práticos">
+                <input type="text" id="adm-categoria" placeholder="Categoria">
+                <input type="text" id="adm-keywords" placeholder="Palavras-chave (separadas por vírgula)">
+
+                <button id="btn-salvar-servico" class="modal-btn modal-btn-blue modal-btn-salvar">
+                    <span class="material-symbols-outlined">save</span> Salvar Serviço
+                </button>
+            </div>
+        </div>
+
+        <div id="tela-remover" class="tela-escondida">
+            <button id="btn-voltar-2" class="btn-voltar">
+                <span class="material-symbols-outlined">arrow_back</span> Voltar ao Menu
+            </button>
+
+            <p class="modal-aviso">Pesquise o serviço que deseja excluir permanentemente:</p>
+
+            <div class="box-busca">
+                <div class="busca-wrapper">
+                    <span class="material-symbols-outlined busca-icon busca-icon-red">search</span>
+                    <input type="text" id="busca-remover" placeholder="Buscar serviço para deletar..." autocomplete="off" class="busca-input busca-input-red">
+                </div>
+                <div id="lista-busca-remover" class="lista-busca tela-escondida"></div>
+            </div>
+
+            <div class="remover-footer">
+                <input type="text" id="adm-deletar-nome" placeholder="Serviço selecionado..." class="input-selecionado" readonly>
+                <button id="btn-deletar-servico" class="modal-btn modal-btn-red" disabled>
+                    <span class="material-symbols-outlined">delete_forever</span> Deletar
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="painel-analytics">
+  <div id="analytics-header">
+    <div id="analytics-logo">
+      <span class="material-symbols-outlined" style="font-size:20px;color:var(--blue)">bar_chart</span>
+      Analytics equipeN1
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="analytics-updated" style="font-size:11px;color:var(--text3);font-family:monospace"></span>
+      <button class="an-icon-btn" id="btn-reset-analytics" title="Limpar dados de analytics">
+        <span class="material-symbols-outlined">restart_alt</span>
+      </button>
+      <button class="an-icon-btn" id="btn-fechar-analytics" title="Fechar Analytics">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="analytics-body">
+
+    <div class="an-kpi-row">
+      <div class="an-kpi an-blue">
+        <div class="an-kpi-label">Total de consultas</div>
+        <div class="an-kpi-value" id="an-total">0</div>
+        <div class="an-kpi-sub" id="an-hoje">0 hoje</div>
+      </div>
+      <div class="an-kpi an-purple">
+        <div class="an-kpi-label">Tópico mais buscado</div>
+        <div class="an-kpi-value an-kpi-sm" id="an-top">—</div>
+        <div class="an-kpi-sub" id="an-top-pct">—</div>
+      </div>
+      <div class="an-kpi an-green">
+        <div class="an-kpi-label">Taxa de resolução</div>
+        <div class="an-kpi-value" id="an-resolved">—%</div>
+        <div class="an-kpi-sub">perguntas respondidas</div>
+      </div>
+      <div class="an-kpi an-amber">
+        <div class="an-kpi-label">Gaps de conhecimento</div>
+        <div class="an-kpi-value" id="an-gaps-count">0</div>
+        <div class="an-kpi-sub">sem resposta</div>
+      </div>
+      <div class="an-kpi an-green" style="border-top-color:#34d399">
+        <div class="an-kpi-label">Satisfação</div>
+        <div class="an-kpi-value" id="an-satisfaction" style="color:#34d399">—%</div>
+        <div class="an-kpi-sub" id="an-satisfaction-sub">feedbacks recebidos</div>
+      </div>
+    </div>
+
+    <div class="an-charts-row">
+      <div class="an-card">
+        <div class="an-card-title">Tópicos mais consultados</div>
+        <div class="an-chart-wrap"><canvas id="an-chart-topics"></canvas></div>
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">Volume — últimos 7 dias</div>
+        <div class="an-chart-wrap"><canvas id="an-chart-daily"></canvas></div>
+      </div>
+    </div>
+
+    <div class="an-bottom-row">
+      <div class="an-card">
+        <div class="an-card-title">Horários de pico</div>
+        <div id="an-hour-bars" class="an-hour-bars"></div>
+        <div class="an-hour-labels">
+          <span>00h</span><span>06h</span><span>12h</span><span>18h</span><span>23h</span>
+        </div>
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">Perguntas sem resposta</div>
+        <div id="an-gaps-table"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+
+const Analytics = {
+  KEY_EVENTS: 'equipeN1_analytics_events',
+  KEY_GAPS:   'equipeN1_analytics_gaps',
+
+  track(query, matched, category) {
+    const events = this._load(this.KEY_EVENTS);
+    events.push({ q: query, matched: !!matched, category: category || 'geral', ts: Date.now() });
+    this._save(this.KEY_EVENTS, events);
+  },
+
+  trackGap(query) {
+    const gaps = this._load(this.KEY_GAPS);
+    const existing = gaps.find(g => g.q.toLowerCase() === query.toLowerCase());
+    if (existing) { existing.count++; existing.last = Date.now(); }
+    else { gaps.push({ q: query, count: 1, first: Date.now(), last: Date.now() }); }
+    this._save(this.KEY_GAPS, gaps);
+  },
+
+  trackFeedback(query, service, positive) {
+    const fb = this._load('equipeN1_analytics_feedback');
+    fb.push({ q: query, service, positive: !!positive, ts: Date.now() });
+    this._save('equipeN1_analytics_feedback', fb);
+  },
+
+  _load(key) { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } },
+  _save(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); } catch {} }
+};
+
+let anChartTopics = null, anChartDaily = null;
+
+function openAnalytics() {
+  document.getElementById('painel-analytics').classList.add('an-visivel');
+  renderAnalytics();
+}
+
+function closeAnalytics() {
+  document.getElementById('painel-analytics').classList.remove('an-visivel');
+  if (anChartTopics) { anChartTopics.destroy(); anChartTopics = null; }
+  if (anChartDaily)  { anChartDaily.destroy();  anChartDaily  = null; }
+}
+
+document.getElementById('btn-fechar-analytics').addEventListener('click', closeAnalytics);
+
+document.getElementById('btn-reset-analytics').addEventListener('click', () => {
+  if (!confirm('Apagar todos os dados de analytics?')) return;
+  localStorage.removeItem('equipeN1_analytics_events');
+  localStorage.removeItem('equipeN1_analytics_gaps');
+  localStorage.removeItem('equipeN1_analytics_feedback');
+  renderAnalytics();
+});
+
+function renderAnalytics() {
+  const events = Analytics._load(Analytics.KEY_EVENTS);
+  const gaps   = Analytics._load(Analytics.KEY_GAPS);
+  const now = Date.now();
+  const dayStart = new Date(); dayStart.setHours(0,0,0,0);
+
+  document.getElementById('an-satisfaction').textContent  = '—%';
+  document.getElementById('an-satisfaction-sub').textContent = 'feedbacks recebidos';
+
+  if (!events.length) {
+    document.getElementById('an-total').textContent    = '0';
+    document.getElementById('an-hoje').textContent     = '0 hoje';
+    document.getElementById('an-top').textContent      = '—';
+    document.getElementById('an-top-pct').textContent  = '—';
+    document.getElementById('an-resolved').textContent = '—%';
+    document.getElementById('an-gaps-count').textContent = '0';
+    document.getElementById('analytics-updated').textContent = 'sem dados ainda';
+    document.getElementById('an-hour-bars').innerHTML  = '';
+    document.getElementById('an-gaps-table').innerHTML = '<p style="color:var(--text3);font-size:13px;padding:12px 0">Nenhuma pergunta sem resposta ainda.</p>';
+    return;
+  }
+
+  const total       = events.length;
+  const hoje        = events.filter(e => e.ts >= dayStart.getTime()).length;
+  const resolved    = events.filter(e => e.matched).length;
+  const resolvedPct = Math.round(resolved / total * 100);
+  document.getElementById('an-total').textContent    = total.toLocaleString('pt-BR');
+  document.getElementById('an-hoje').textContent     = `${hoje} hoje`;
+  document.getElementById('an-resolved').textContent = `${resolvedPct}%`;
+  document.getElementById('an-gaps-count').textContent = gaps.length;
+
+  const feedback = Analytics._load('equipeN1_analytics_feedback');
+  if (feedback.length) {
+    const positivos = feedback.filter(f => f.positive).length;
+    const satisfPct = Math.round(positivos / feedback.length * 100);
+    document.getElementById('an-satisfaction').textContent = `${satisfPct}%`;
+    document.getElementById('an-satisfaction-sub').textContent = `${feedback.length} feedback${feedback.length !== 1 ? 's' : ''} recebido${feedback.length !== 1 ? 's' : ''}`;
+  }
+
+  const catCount = {};
+  events.forEach(e => { catCount[e.category] = (catCount[e.category] || 0) + 1; });
+  const topCat = Object.entries(catCount).sort((a,b) => b[1]-a[1])[0];
+  if (topCat) {
+    document.getElementById('an-top').textContent    = topCat[0];
+    document.getElementById('an-top-pct').textContent = `${Math.round(topCat[1]/total*100)}% das consultas`;
+  }
+
+  const lastTs = new Date(Math.max(...events.map(e => e.ts)));
+  document.getElementById('analytics-updated').textContent = `atualizado ${lastTs.toLocaleString('pt-BR')}`;
+
+  if (anChartTopics) { anChartTopics.destroy(); anChartTopics = null; }
+  const sortedCats = Object.entries(catCount).sort((a,b) => b[1]-a[1]).slice(0,7);
+  const colors = ['#007BC0','#7c5cfc','#22C55E','#F59E0B','#f87171','#38bdf8','#a78bfa'];
+  anChartTopics = new Chart(document.getElementById('an-chart-topics'), {
+    type: 'bar',
+    data: {
+      labels: sortedCats.map(c => c[0]),
+      datasets: [{ data: sortedCats.map(c => c[1]), backgroundColor: colors, borderRadius: 5, borderSkipped: false }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666', font: { size: 11 } } }
+      }
+    }
+  });
+
+  if (anChartDaily) { anChartDaily.destroy(); anChartDaily = null; }
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
+    days.push(d);
+  }
+  const dailyCounts = days.map(d => {
+    const next = new Date(d); next.setDate(next.getDate() + 1);
+    return events.filter(e => e.ts >= d.getTime() && e.ts < next.getTime()).length;
+  });
+  anChartDaily = new Chart(document.getElementById('an-chart-daily'), {
+    type: 'line',
+    data: {
+      labels: days.map(d => d.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' })),
+      datasets: [{
+        data: dailyCounts,
+        borderColor: '#007BC0',
+        backgroundColor: 'rgba(0,123,192,0.1)',
+        fill: true, tension: 0.4,
+        pointBackgroundColor: '#007BC0', pointRadius: 4, pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666', font: { size: 11 } }, beginAtZero: true }
+      }
+    }
+  });
+
+  const hourCounts = new Array(24).fill(0);
+  events.forEach(e => { hourCounts[new Date(e.ts).getHours()]++; });
+  const maxHour = Math.max(...hourCounts, 1);
+  const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
+  const barsEl = document.getElementById('an-hour-bars');
+  barsEl.innerHTML = '';
+  hourCounts.forEach((c, h) => {
+    const bar = document.createElement('div');
+    bar.className = 'an-hour-bar' + (h === peakHour ? ' an-peak' : '');
+    bar.style.height = `${Math.max(4, Math.round(c / maxHour * 100))}%`;
+    bar.title = `${h}h — ${c} consulta${c !== 1 ? 's' : ''}`;
+    barsEl.appendChild(bar);
+  });
+
+  const gapsEl = document.getElementById('an-gaps-table');
+  if (!gaps.length) {
+    gapsEl.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:12px 0">Nenhuma pergunta sem resposta ainda.</p>';
+  } else {
+    const sorted = [...gaps].sort((a,b) => b.count - a.count);
+    gapsEl.innerHTML = `
+      <table class="an-table">
+        <thead><tr>
+          <th>Pergunta</th>
+          <th style="text-align:center">Ocorr.</th>
+          <th>Status</th>
+        </tr></thead>
+        <tbody>${sorted.map(g => `
+          <tr>
+            <td style="padding-right:12px">${g.q}</td>
+            <td style="text-align:center;font-family:monospace;font-size:12px;color:var(--text2)">${g.count}×</td>
+            <td><span class="an-badge ${g.count >= 5 ? 'an-badge-red' : g.count >= 3 ? 'an-badge-amber' : 'an-badge-green'}">${g.count >= 5 ? 'urgente' : g.count >= 3 ? 'atenção' : 'baixo'}</span></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+}
+</script>
+
+<script src="script.js" charset="UTF-8"></script>
+</body>
+</html>
